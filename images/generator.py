@@ -3,20 +3,15 @@ import time
 import random
 import requests
 from slugify import slugify
-from openai import AzureOpenAI
+from utils.openai_client import get_client,image_client
+
+
 
 # Load clients
-prompt_client = AzureOpenAI(
-    api_key=os.getenv("AZURE_OPENAI_PROMPT_API_KEY"),
-    azure_endpoint=os.getenv("AZURE_OPENAI_PROMPT_ENDPOINT"),
-    api_version=os.getenv("AZURE_API_VERSION")
-)
+prompt_client = get_client()
+image_client = image_client()
 
-image_client = AzureOpenAI(
-    api_key=os.getenv("AZURE_IMAGE_API_KEY"),
-    azure_endpoint=os.getenv("AZURE_IMAGE_ENDPOINT"),
-    api_version=os.getenv("AZURE_IMAGE_API_VERSION")
-)
+
 
 # Load base prompt
 with open("base_prompt.txt", "r", encoding="utf-8") as f:
