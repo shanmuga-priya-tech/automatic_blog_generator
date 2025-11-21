@@ -1,0 +1,26 @@
+Create a photorealistic, cinematic image set in a {time_of_day} scene in a Tier 2 or Tier 3 Indian city.
+
+The setting shows {scene_type} — for example, a {location_detail} such as {examples_of_setting}.
+
+The environment should reflect a clean, middle-class, urban-neighborhood aesthetic — paved roads, scooters or small cars parked nearby, tidy houses or shops with tiled or concrete roofs, potted plants, modest streetlights, and signage in local language.
+
+Prominently feature solar energy integration, such as rooftop solar panels, solar-powered streetlights, or a solar inverter box near a doorway.
+
+Show people engaged in authentic daily life moments, such as {human_activity} — e.g. a shopkeeper turning on solar-powered lights, a technician checking solar panels, children studying under warm light, or a family relaxing on the porch during evening.
+
+The composition should convey hope, progress, and sustainability.
+
+Maintain soft cinematic lighting with warm color tones — sunset orange, soft green, and beige walls — emphasizing a golden-hour glow that feels positive and aspirational.
+
+Include subtle, context-appropriate “Ghar Ghar Solar” branding — such as:
+A signboard or shop banner,
+A technician’s uniform,
+Or a small transparent watermark in one corner.
+
+Style: documentary realism, natural expressions, and balanced contrast between lit and shadowed areas to show the impact of solar energy.
+
+Optional details: {extra_elements} (e.g., birds, street dogs, local trees, tea stalls, kids playing cricket).
+
+The final image should feel warm, relatable, and aspirational, representing the positive transformation of everyday Indian life through clean solar energy.
+
+Create this as a wide cinematic landscape-format image suitable for a blog header, with balanced empty space for text.

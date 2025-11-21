@@ -1,4 +1,3 @@
-# main.py
 import os
 import time
 import json
@@ -12,6 +11,8 @@ from company.summariser import summarize_company_info
 from topics.generator import generate_blog_topics
 from guidelines.generator import generate_guideline_text, save_guideline_text
 from blogs.generator import generate_blog_from_guideline, save_blog_md
+from images.generator import generate_images_for_blog
+
 
 # initialize client
 client = get_client()
@@ -47,58 +48,85 @@ def extract_clean_text(url):
         return ""
 
 def run_full_pipeline():
-    base_url = input("Enter website URL: ").strip()
+    # base_url = input("Enter website URL: ").strip()
+    base_url = "https://www.ghargharsolar.in/"
     if not base_url:
         print("No URL provided. Exiting.")
         return
 
-    print("\n➡ Crawling homepage for internal links...")
-    links = crawl_links(base_url, limit=6)
-    print(f"Found {len(links)} links")
-
-    homepage_info = extract_homepage_info(base_url)
-
-    print("➡ Extracting content from links...")
-    texts = []
-    for u in links:
-        t = extract_clean_text(u)
-        if t:
-            texts.append(t)
-        time.sleep(0.2)
-
-    combined_text = (
-        f"WEBSITE TITLE: {homepage_info.get('title','')}\n"
-        f"META DESCRIPTION: {homepage_info.get('meta_description','')}\n"
-        f"HEADINGS: {', '.join(homepage_info.get('headings',[]))}\n\n"
-        + "\n\n".join(texts)
-    )
-
-    print("➡ Summarizing company profile...")
-    company_profile = summarize_company_info(client, combined_text, base_url)
-    if not company_profile:
-        print("Company profile generation failed. Exiting.")
-        return
-
     domain_info = tldextract.extract(base_url)
     domain_name = f"{domain_info.domain}.{domain_info.suffix}"
+
+    summary_file = f"output/{domain_name}_summary.json"
     topics_file = f"output/{domain_name}_topics.json"
 
+    # ------------------------------------------
+    #   1. CHECK IF SUMMARY EXISTS
+    # ------------------------------------------
+    if os.path.exists(summary_file):
+        print(f"➡ Found existing company summary → {summary_file}")
+        with open(summary_file, "r", encoding="utf-8") as f:
+            company_profile = json.load(f)
+    else:
+        # ------------------------------------------
+        #   2. RUN CRAWLING + SUMMARIZATION ONLY IF NOT EXISTS
+        # ------------------------------------------
+        print("\n➡ Crawling homepage for internal links...")
+        links = crawl_links(base_url, limit=6)
+        print(f"Found {len(links)} links")
+
+        homepage_info = extract_homepage_info(base_url)
+        print("➡ Extracting content from links...")
+        texts = []
+        for u in links:
+            t = extract_clean_text(u)
+            if t:
+                texts.append(t)
+            time.sleep(0.2)
+
+        combined_text = (
+            f"WEBSITE TITLE: {homepage_info.get('title','')}\n"
+            f"META DESCRIPTION: {homepage_info.get('meta_description','')}\n"
+            f"HEADINGS: {', '.join(homepage_info.get('headings',[]))}\n\n"
+            + "\n\n".join(texts)
+        )
+
+        print("➡ Generating summary for first time...")
+        company_profile = summarize_company_info(client, combined_text, base_url)
+        if not company_profile:
+            print("Company profile generation failed. Exiting.")
+            return
+
+        # SAVE SUMMARY
+        os.makedirs("output", exist_ok=True)
+        with open(summary_file, "w", encoding="utf-8") as f:
+            json.dump(company_profile, f, indent=2, ensure_ascii=False)
+        print(f"✔ Saved company summary → {summary_file}")
+
+    # ------------------------------------------
+    #   3. TOPICS: USE EXISTING IF POSSIBLE
+    # ------------------------------------------
     if os.path.exists(topics_file):
-        print(f"Loading existing topics file: {topics_file}")
+        print(f"➡ Using existing topics file: {topics_file}")
         with open(topics_file, "r", encoding="utf-8") as f:
             topics = json.load(f)
     else:
-        print("➡ Generating 10 topics...")
+        print("➡ Generating topics for first time...")
         topics = generate_blog_topics(client, company_profile, base_url)
         if not topics:
-            print("Topic generation failed. Exiting.")
+            print("Topics generation failed. Exiting.")
             return
 
+        with open(topics_file, "w", encoding="utf-8") as f:
+            json.dump(topics, f, indent=2, ensure_ascii=False)
+        print(f"✔ Saved topics → {topics_file}")
+
+   
     # ensure output directories exist
     os.makedirs("output/guidelines", exist_ok=True)
     os.makedirs("output/blogs", exist_ok=True)
 
-    topics_to_process = topics[-2:] if isinstance(topics, list) else []
+    topics_to_process = topics[1:2] if isinstance(topics, list) else []
     print(f"\nProcessing {len(topics_to_process)} topic(s) (the last batch).")
 
     for topic in topics_to_process:
@@ -118,7 +146,9 @@ def run_full_pipeline():
             continue
         blog_path = save_blog_md(blog_md, title, out_dir="output/blogs")
         print(f"Saved blog → {blog_path}")
-
+        image_generation = generate_images_for_blog(
+            title, blog_md, num_images=1
+        )
         time.sleep(0.5)
 
     print("\n Pipeline finished. Check output/guidelines/ and output/blogs/ folders.")

@@ -16,10 +16,36 @@ Return ONLY valid JSON with keys:
 - target_audience
 - tone
 - keywords (array)
-    
+- unique_value_proposition
+- government_schemes_supported (array)
+- benefits_for_bihar_homeowners (array)
+- vision_statement
+
+Make sure the summary includes:
+- Subsidies & schemes: Ghar Ghar Solar, PM Surya Ghar Yojana
+- Benefits: zero electricity bills, government loans at 6%, top-quality solar products
+- Bihar-specific relevance and impact
+- Vision for solar adoption in Bihar
+
+Return JSON in this structure (escape braces inside JSON):
+{{
+  "company_name": "",
+  "industry": "",
+  "main_products_services": [],
+  "target_audience": [],
+  "tone": "",
+  "keywords": [],
+  "unique_value_proposition": "",
+  "government_schemes_supported": [],
+  "benefits_for_bihar_homeowners": [],
+  "vision_statement": ""
+}}
+
 Website text (truncated to 8000 chars):
 {text[:8000]}
 """
+
+
     try:
         resp = client.chat.completions.create(
             model="gpt-4o-mini",
